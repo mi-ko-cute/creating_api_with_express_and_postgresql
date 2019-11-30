@@ -12,7 +12,9 @@
     "sequelize-cli": "^5.5.1"
   },
   "scripts": {
-    "start": "NODE_ENV=development nodemon src/index.js"
+    "env_set": "set NODE_ENV=development",
+    "server": "nodemon src/index.js",
+    "start": "npm run env_set && npm run server"
   },
   "devDependencies": {
     "morgan": "^1.9.1",
