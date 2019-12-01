@@ -1,8 +1,5 @@
 'use strict'
 
-// Promise 例外処理を補足
-process.on('unhandledRejection', console.dir);
-
 const Todo = require('../db/models/index');
 
 const STATUS_CODES = {
@@ -20,14 +17,20 @@ const formatResponseData = (data) => ({ data });
 module.exports = {
     // Read
     async getTodos(req, res) {
-        const todos = await Todo.Todos.findAll({
-            order: [
-                ['id', 'ASC']
-            ],
-            raw: true
-        });
+        try {
+            const todos = await Todo.Todos.findAll({
+                order: [
+                    ['id', 'ASC']
+                ],
+                raw: true
+            });
 
-        send(res, STATUS_CODES.OK, formatResponseData({ todos }));
+            res.status(STATUS_CODES.OK).json(formatResponseData({ todos }));
+        } catch (error) {
+            res.status(STATUS_CODES.BAD_REQUEST).json(formatResponseData({
+                error: error.message
+            }));
+        }
     },
 
     // Create

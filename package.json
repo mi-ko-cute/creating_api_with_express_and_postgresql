@@ -12,12 +12,16 @@
     "sequelize-cli": "^5.5.1"
   },
   "scripts": {
+    "test": "mocha",
     "env_set": "set NODE_ENV=development",
     "server": "nodemon src/index.js",
     "start": "npm run env_set && npm run server"
   },
   "devDependencies": {
+    "mocha": "^6.2.2",
     "morgan": "^1.9.1",
-    "nodemon": "^2.0.1"
+    "nodemon": "^2.0.1",
+    "power-assert": "^1.6.1",
+    "supertest": "^4.0.2"
   }
 }
