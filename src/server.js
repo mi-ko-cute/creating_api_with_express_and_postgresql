@@ -4,9 +4,14 @@ const morgan = require('morgan');
 const app = express();
 const apiRouter = require('./resources/api.router');
 
+function middlewareForAllowOrigin(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+}
+
 app.use('/api/', [
-    // Third party middlewares.
-    // You can put any middle wares that handle what you want to do.
+    middlewareForAllowOrigin,
     express.json(),
     express.urlencoded({ extended: true }),
 
