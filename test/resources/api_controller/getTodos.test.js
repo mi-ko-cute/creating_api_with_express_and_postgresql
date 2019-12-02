@@ -36,9 +36,9 @@ describe('Test Get api/todos', () => {
             assert.strictEqual(typeof todo.id, 'number');
             assert.strictEqual(typeof todo.title, 'string');
             assert.strictEqual(typeof todo.body, 'string');
-            assert.strictEqual(typeof todo.completed, 'number');
+            assert.strictEqual(typeof todo.completed, 'boolean');
             assert.strictEqual(typeof todo.createdAt, 'string');
             assert.strictEqual(typeof todo.updatedAt, 'string');
-        })
-    })
-})
+        });
+    });
+});

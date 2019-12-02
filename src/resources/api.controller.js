@@ -21,8 +21,7 @@ module.exports = {
             const todos = await Todo.Todos.findAll({
                 order: [
                     ['id', 'ASC']
-                ],
-                raw: true
+                ]
             });
 
             res.status(STATUS_CODES.OK).json(formatResponseData({ todos }));
