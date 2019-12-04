@@ -34,18 +34,20 @@ module.exports = {
 
     // Create
     async postTodo(req, res) {
+        let transaction;
         try {
-            const transaction = await models.sequelize.transaction();
-
+            transaction = await models.sequelize.transaction();
             const {title, body} = req.body;
 
-            await models.Todos.create({
+            const todo = await models.Todos.create({
                 title,
                 body
             }, {transaction});
 
-            res.status(STATUS_CODES.OK).json(formatResponseData({title, body}));
+            await transaction.commit();
+            res.status(STATUS_CODES.OK).json(formatResponseData({todo}));
         } catch (error) {
+            await transaction.rollback();
             res.status(STATUS_CODES.BAD_REQUEST).json(formatResponseData({
                 error: error.message
             }))
