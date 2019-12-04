@@ -15,7 +15,7 @@ const getTodos = async () => {
 }
 
 
-describe('Test Get api/todos', () => {
+describe('Test POST api/todos', () => {
     before(async () => {
         const insertTodos = [];
         for (let i = 1; i <= 5; i++) {
@@ -100,6 +100,5 @@ describe('Test Get api/todos', () => {
         // データをテーブルに作成したので、レコードが1件増えていることを確認
         const currentTodos = await getTodos();
         assert.strictEqual(currentTodos.todos.length, oldTodos.todos.length + 1);
-
     });
 });
