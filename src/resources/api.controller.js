@@ -1,6 +1,6 @@
 'use strict'
 
-const Todo = require('../db/models/index');
+const models = require('../db/models/index');
 
 const STATUS_CODES = {
     OK: 200,
@@ -18,7 +18,7 @@ module.exports = {
     // Read
     async getTodos(req, res) {
         try {
-            const todos = await Todo.Todos.findAll({
+            const todos = await models.Todos.findAll({
                 order: [
                     ['id', 'ASC']
                 ]
@@ -33,8 +33,25 @@ module.exports = {
     },
 
     // Create
-    postTodo(req, res) {
-        send(res, STATUS_CODES.OK, '`postTodo` should create a new todo to DB', false);
+    async postTodo(req, res) {
+        let transaction;
+        try {
+            transaction = await models.sequelize.transaction();
+            const {title, body} = req.body;
+
+            const todo = await models.Todos.create({
+                title,
+                body
+            }, {transaction});
+
+            await transaction.commit();
+            res.status(STATUS_CODES.OK).json(formatResponseData({todo}));
+        } catch (error) {
+            await transaction.rollback();
+            res.status(STATUS_CODES.BAD_REQUEST).json(formatResponseData({
+                error: error.message
+            }))
+        }
     },
 
     // Update
