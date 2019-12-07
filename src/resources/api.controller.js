@@ -4,7 +4,8 @@ const models = require('../db/models/index');
 
 const STATUS_CODES = {
     OK: 200,
-    BAD_REQUEST: 400
+    BAD_REQUEST: 400,
+    NOT_FOUND: 404
 };
 
 const formatResponseData = (data) => ({ data });
@@ -37,15 +38,15 @@ module.exports = {
         let transaction;
         try {
             transaction = await models.sequelize.transaction();
-            const {title, body} = req.body;
+            const { title, body } = req.body;
 
             const todo = await models.Todos.create({
                 title,
                 body
-            }, {transaction});
+            }, { transaction });
 
             await transaction.commit();
-            res.status(STATUS_CODES.OK).json(formatResponseData({todo}));
+            res.status(STATUS_CODES.OK).json(formatResponseData({ todo }));
         } catch (error) {
             await transaction.rollback();
             res.status(STATUS_CODES.BAD_REQUEST).json(formatResponseData({
@@ -55,8 +56,38 @@ module.exports = {
     },
 
     // Update
-    putTodo(req, res) {
-        send(res, STATUS_CODES.OK, '`putTodo` should update a todo in DB', false);
+    async putTodo(req, res) {
+        let transaction;
+        try {
+            transaction = await models.sequelize.transaction();
+            const todo = await models.Todos.findByPk(req.body.id, { transaction });
+            if (!todo) {
+                throw new Error(`Couldn't find a todo of ID ${req.body.id}`);
+            }
+
+            for (let property in req.body) {
+                if (property !== 'id') {
+                    todo[property] = req.body[property];
+                }
+            }
+
+            await todo.save({ transaction });
+            await transaction.commit();
+            res.status(STATUS_CODES.OK).json(formatResponseData({ todo }));
+
+        } catch (error) {
+            await transaction.rollback();
+
+            if (error.message === `Couldn't find a todo of ID ${req.body.id}`) {
+                res.status(STATUS_CODES.NOT_FOUND).json(formatResponseData({
+                    error: error.message
+                }));
+            } else {
+                res.status(STATUS_CODES.BAD_REQUEST).json(formatResponseData({
+                    error: error.message
+                }));
+            }
+        }
     },
 
     // Delete
