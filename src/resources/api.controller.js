@@ -4,7 +4,8 @@ const models = require('../db/models/index');
 
 const STATUS_CODES = {
     OK: 200,
-    BAD_REQUEST: 400
+    BAD_REQUEST: 400,
+    NOT_FOUND: 404
 };
 
 const formatResponseData = (data) => ({ data });
@@ -37,15 +38,15 @@ module.exports = {
         let transaction;
         try {
             transaction = await models.sequelize.transaction();
-            const {title, body} = req.body;
+            const { title, body } = req.body;
 
             const todo = await models.Todos.create({
                 title,
                 body
-            }, {transaction});
+            }, { transaction });
 
             await transaction.commit();
-            res.status(STATUS_CODES.OK).json(formatResponseData({todo}));
+            res.status(STATUS_CODES.OK).json(formatResponseData({ todo }));
         } catch (error) {
             await transaction.rollback();
             res.status(STATUS_CODES.BAD_REQUEST).json(formatResponseData({
@@ -55,8 +56,39 @@ module.exports = {
     },
 
     // Update
-    putTodo(req, res) {
-        send(res, STATUS_CODES.OK, '`putTodo` should update a todo in DB', false);
+    async putTodo(req, res) {
+        let transaction;
+        try {
+            transaction = await models.sequelize.transaction();
+
+            // URLからidを取得して、idを文字列から数値に変換
+            const id = req.params.id;
+            const parsedId = parseInt(id, 10);
+
+            // idで該当のレコードが存在するか確認し、存在しなかったら404エラーを返す
+            const todo = await models.Todos.findByPk(parsedId, { transaction });
+            if (!todo) {
+                const error = new Error(`Couldn't find a todo of ID ${parsedId}`);
+                error.status = STATUS_CODES.NOT_FOUND;
+                throw error;
+            }
+
+            for (let property in req.body) {
+                if (property !== 'id') {
+                    todo[property] = req.body[property];
+                }
+            }
+
+            await todo.save({ transaction });
+            await transaction.commit();
+            res.status(STATUS_CODES.OK).json(formatResponseData({ todo }));
+
+        } catch (error) {
+            await transaction.rollback();
+            res.status(error.status).json(formatResponseData({
+                error: error.message
+            }));
+        }
     },
 
     // Delete

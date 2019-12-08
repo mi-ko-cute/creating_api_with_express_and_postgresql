@@ -19,7 +19,6 @@ describe('Test Get api/todos', () => {
     });
     after(async () => {
         await sequlize.truncate();
-        await sequlize.close();
     });
 
     it('正常にGETリクエストが成功した場合、挿入したテストデータが返る', async () => {

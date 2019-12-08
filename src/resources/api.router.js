@@ -3,9 +3,13 @@
 const router = require('express').Router();
 const controller = require('./api.controller');
 
-router.route('/todos')
+router
+    .route('/todos')
     .get(controller.getTodos)
-    .post(controller.postTodo)
+    .post(controller.postTodo);
+
+router
+    .route('/todos/:id')
     .put(controller.putTodo)
     .delete(controller.deleteTodo);
 
