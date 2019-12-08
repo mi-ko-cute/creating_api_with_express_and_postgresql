@@ -6,7 +6,7 @@ const controller = require('./api.controller');
 router
     .route('/todos')
     .get(controller.getTodos)
-    .post(controller.postTodo)
+    .post(controller.postTodo);
 
 router
     .route('/todos/:id')

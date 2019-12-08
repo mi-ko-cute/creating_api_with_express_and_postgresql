@@ -82,7 +82,7 @@ describe('Test PUT api/todos', () => {
 
         // 対象レコードの更新前と更新後の中身が違うことを確認
         const currentTodos = await getTodos();
-        assert.notStrictEqual(currentTodos.todos[0], oldTodos.todos.length[0]);
+        assert.notStrictEqual(currentTodos.todos[0], oldTodos.todos[0]);
 
         // updatedAtがcreatedAtより最新であることを確認
         assert.strictEqual(currentTodos.todos[0].updatedAt >= currentTodos.todos[0].createdAt, true);
