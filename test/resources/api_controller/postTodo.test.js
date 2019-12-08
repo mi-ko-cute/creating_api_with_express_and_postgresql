@@ -30,7 +30,6 @@ describe('Test POST api/todos', () => {
     });
     after(async () => {
         await sequlize.truncate();
-        await sequlize.close();
     });
 
     it('リクエストのbodyプロパティにtitleが含まれていなかった場合、400エラーが返る', async () => {

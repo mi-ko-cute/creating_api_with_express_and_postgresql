@@ -32,23 +32,21 @@ describe('Test PUT api/todos', () => {
     });
     after(async () => {
         await sequlize.truncate();
-        await sequlize.close();
     });
 
-    it('リクエストのbodyプロパティIDがテーブルに存在しないIDの場合、404エラーが返る', async () => {
+    it('リクエストURLのプロパティIDがテーブルに存在しないIDの場合、404エラーが返る', async () => {
         const oldTodos = await getTodos();
 
-        const notExistId = {
-            id: INVALID_ID,
+        const failureTodo = {
             title: 'test_title',
             body: 'test body'
         };
 
         const response = await requestHelper.request({
             method: 'put',
-            endPoint: '/api/todos',
+            endPoint: `/api/todos/${INVALID_ID}`,
             statusCode: 404
-        }).send(notExistId);
+        }).send(failureTodo);
 
         assert.strictEqual(response.body.data.error, `Couldn't find a todo of ID ${INVALID_ID}`);
 
@@ -57,18 +55,17 @@ describe('Test PUT api/todos', () => {
         assert.strictEqual(oldTodos.todos.length, currentTodos.todos.length);
     });
 
-    it('リクエストのbodyプロパティIDがテーブルに存在した場合、対象のレコードが更新される', async () => {
+    it('リクエストURLのプロパティIDがテーブルに存在する場合、対象のレコードが更新される', async () => {
         const oldTodos = await getTodos();
 
         const todo = {
-            id: VALID_ID,
-            title: 'update title',
-            body: 'update body'
+            title: 'updated title',
+            body: 'updated body'
         };
 
         const response = await requestHelper.request({
             method: 'put',
-            endPoint: '/api/todos',
+            endPoint: `/api/todos/${VALID_ID}`,
             statusCode: 200
         }).send(todo);
 

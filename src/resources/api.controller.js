@@ -60,9 +60,17 @@ module.exports = {
         let transaction;
         try {
             transaction = await models.sequelize.transaction();
-            const todo = await models.Todos.findByPk(req.body.id, { transaction });
+
+            // URLからidを取得して、idを文字列から数値に変換
+            const id = req.params.id;
+            const parsedId = parseInt(id, 10);
+
+            // idで該当のレコードが存在するか確認し、存在しなかったら404エラーを返す
+            const todo = await models.Todos.findByPk(parsedId, { transaction });
             if (!todo) {
-                throw new Error(`Couldn't find a todo of ID ${req.body.id}`);
+                const error = new Error(`Couldn't find a todo of ID ${parsedId}`);
+                error.status = STATUS_CODES.NOT_FOUND;
+                throw error;
             }
 
             for (let property in req.body) {
@@ -77,16 +85,9 @@ module.exports = {
 
         } catch (error) {
             await transaction.rollback();
-
-            if (error.message === `Couldn't find a todo of ID ${req.body.id}`) {
-                res.status(STATUS_CODES.NOT_FOUND).json(formatResponseData({
-                    error: error.message
-                }));
-            } else {
-                res.status(STATUS_CODES.BAD_REQUEST).json(formatResponseData({
-                    error: error.message
-                }));
-            }
+            res.status(error.status).json(formatResponseData({
+                error: error.message
+            }));
         }
     },
 
