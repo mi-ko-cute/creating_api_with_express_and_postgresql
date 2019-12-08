@@ -109,12 +109,6 @@ module.exports = {
                 throw error;
             }
 
-            for (let property in req.body) {
-                if (property !== 'id') {
-                    todo[property] = req.body[property];
-                }
-            }
-
             await todo.destroy({ transaction });
             await transaction.commit();
             res.status(STATUS_CODES.OK).json(formatResponseData({ todo }));

@@ -50,7 +50,7 @@ describe('Test DELETE api/todos', () => {
         assert.strictEqual(oldTodos.todos.length, currentTodos.todos.length);
     });
 
-    it('リクエストURLのプロパティIDがテーブルに存在する場合、対象のレコードが更新される', async () => {
+    it('リクエストURLのプロパティIDがテーブルに存在する場合、対象のレコードが削除される', async () => {
         const oldTodos = await getTodos();
 
         const response = await requestHelper.request({
